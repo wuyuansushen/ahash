@@ -8,13 +8,25 @@ namespace ahash
 {
     public class Program
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
-            Console.Write($"Input torrent hash:");
-            string inputHash = ((Console.ReadLine()) ?? throw new ArgumentNullException());
             try
             {
-                var aria2cProcess = Process.Start("/usr/bin/aria2c", "--bt-save-metadata=true --bt-metadata-only=true magnet:?xt=urn:btih:" + inputHash);
+                string inputHash = args[0].Trim();
+                const string opts = @"--bt-save-metadata=true --bt-metadata-only=true ";
+                const string magnetPrefix = @"magnet:?xt=urn:btih:";
+                string downloadLink=String.Empty;
+                if (inputHash.StartsWith(magnetPrefix))
+                {
+                    downloadLink = inputHash;
+                }
+                else
+                {
+                    downloadLink =magnetPrefix+inputHash;
+                }
+
+                var aria2cProcess = Process.Start("/usr/bin/aria2c",
+                    opts+downloadLink);
                 aria2cProcess.WaitForExit();
             }
             catch (Exception ex)
